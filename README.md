@@ -6,8 +6,13 @@ Chronos Pomodoro é uma aplicação web desenvolvida com React e Vite que implem
 React, Vite, JavaScript/TypeScript, HTML5 e CSS3.
 
 # Funcionalidades:
+
 ⏱️ Cronômetro para sessões de foco.
+
 ☕ Descanso curto.
+
 🌙 Descanso longo.
+
 🔄 Alternância automática entre os ciclos.
+
 🎨 Interface moderna e responsiva.
