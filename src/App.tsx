@@ -3,6 +3,8 @@ import './styles/theme.css';
 import './styles/global.css';
 import { Logo } from './components/Logo';
 import { Menu } from './components/Menu';
+import { CountDown } from './components/CountDown';
+import { Input } from './components/Input/Input';
 
 export function App() {
   return (
@@ -13,6 +15,36 @@ export function App() {
 
       <Container>
         <Menu />
+      </Container>
+
+      <Container>
+        <CountDown />
+      </Container>
+
+      <Container>
+        <form className='form' action=''>
+          <div className='formRow'>
+            <Input
+              id='meuInput'
+              labelText='task'
+              type='text'
+              placeholder='Digite algo'
+            />
+          </div>
+
+          <div className='formRow'>
+            <p>Cada ciclo dura 5 minutos.</p>
+          </div>
+
+          <div className='formRow'>
+            <p>Ciclos</p>
+            <p>0 0 0 0 0</p>
+          </div>
+
+          <div className='formRow'>
+            <button>Enviar</button>
+          </div>
+        </form>
       </Container>
     </>
   );
