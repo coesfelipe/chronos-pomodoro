@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-refresh/only-export-components */
+
 import {
   createContext,
   useContext,
@@ -14,12 +14,6 @@ type CycleType =
   | 'workTime'
   | 'shortBreakTime'
   | 'longBreakTime';
-
-type TaskConfig = {
-  workTime: number;
-  shortBreakTime: number;
-  longBreakTime: number;
-};
 
 type TaskContextValue = {
   tasks: TaskModel[];
@@ -38,7 +32,7 @@ type TaskContextProviderProps = {
 const TaskContext =
   createContext<TaskContextValue | null>(null);
 
-const initialConfig: TaskConfig = {
+const taskConfig = {
   workTime: 1,
   shortBreakTime: 1,
   longBreakTime: 1,
@@ -53,16 +47,12 @@ function formatSeconds(seconds: number) {
   ).padStart(2, '0')}`;
 }
 
-function getNextCycleType(
-  currentCycle: number,
-): CycleType {
-  const nextCycle = currentCycle + 1;
-
-  if (nextCycle % 8 === 0) {
+function getCycleType(cycle: number): CycleType {
+  if (cycle % 8 === 0) {
     return 'longBreakTime';
   }
 
-  if (nextCycle % 2 === 0) {
+  if (cycle % 2 === 0) {
     return 'shortBreakTime';
   }
 
@@ -72,34 +62,27 @@ function getNextCycleType(
 export function TaskContextProvider({
   children,
 }: TaskContextProviderProps) {
-  const [tasks, setTasks] =
-    useState<TaskModel[]>([]);
-
+  const [tasks, setTasks] = useState<TaskModel[]>([]);
   const [activeTask, setActiveTask] =
     useState<TaskModel | null>(null);
-
   const [secondsRemaining, setSecondsRemaining] =
     useState(0);
-
-  const [currentCycle, setCurrentCycle] =
-    useState(0);
+  const [currentCycle, setCurrentCycle] = useState(0);
 
   function startTask(taskName: string) {
-    const normalizedTaskName = taskName.trim();
+    const name = taskName.trim();
 
-    if (!normalizedTaskName) {
+    if (!name || activeTask) {
       return;
     }
 
-    const cycleType =
-      getNextCycleType(currentCycle);
+    const nextCycle = currentCycle + 1;
+    const cycleType = getCycleType(nextCycle);
+    const duration = taskConfig[cycleType];
 
-    const duration =
-      initialConfig[cycleType];
-
-    const task: TaskModel = {
+    const newTask: TaskModel = {
       id: crypto.randomUUID(),
-      name: normalizedTaskName,
+      name,
       duration,
       startDate: Date.now(),
       completeDate: null,
@@ -109,15 +92,11 @@ export function TaskContextProvider({
 
     setTasks(previousTasks => [
       ...previousTasks,
-      task,
+      newTask,
     ]);
 
-    setActiveTask(task);
-
-    setCurrentCycle(
-      previousCycle => previousCycle + 1,
-    );
-
+    setActiveTask(newTask);
+    setCurrentCycle(nextCycle);
     setSecondsRemaining(duration * 60);
   }
 
@@ -126,9 +105,11 @@ export function TaskContextProvider({
       return;
     }
 
+    const activeTaskId = activeTask.id;
+
     setTasks(previousTasks =>
       previousTasks.map(task =>
-        task.id === activeTask.id
+        task.id === activeTaskId
           ? {
               ...task,
               interruptDate: Date.now(),
@@ -142,39 +123,46 @@ export function TaskContextProvider({
   }
 
   useEffect(() => {
-    if (!activeTask || secondsRemaining <= 0) {
+    if (!activeTask) {
       return;
     }
 
+    const activeTaskId = activeTask.id;
+
     const intervalId = window.setInterval(() => {
-      setSecondsRemaining(previousSeconds =>
-        Math.max(previousSeconds - 1, 0),
-      );
+      setSecondsRemaining(previousSeconds => {
+        if (previousSeconds > 1) {
+          return previousSeconds - 1;
+        }
+
+        window.clearInterval(intervalId);
+
+        setTasks(previousTasks =>
+          previousTasks.map(task =>
+            task.id === activeTaskId &&
+            task.interruptDate === null
+              ? {
+                  ...task,
+                  completeDate: Date.now(),
+                }
+              : task,
+          ),
+        );
+
+        setActiveTask(currentTask =>
+          currentTask?.id === activeTaskId
+            ? null
+            : currentTask,
+        );
+
+        return 0;
+      });
     }, 1000);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [activeTask, secondsRemaining]);
-
-  useEffect(() => {
-    if (!activeTask || secondsRemaining !== 0) {
-      return;
-    }
-
-    setTasks(previousTasks =>
-      previousTasks.map(task =>
-        task.id === activeTask.id
-          ? {
-              ...task,
-              completeDate: Date.now(),
-            }
-          : task,
-      ),
-    );
-
-    setActiveTask(null);
-  }, [activeTask, secondsRemaining]);
+  }, [activeTask]);
 
   const formattedSecondsRemaining =
     formatSeconds(secondsRemaining);
