@@ -16,9 +16,7 @@ export function MainForm() {
     showNotification,
   } = useTaskContext();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
+  function handleStart() {
     const normalizedTaskName = taskName.trim();
 
     if (!normalizedTaskName) {
@@ -27,24 +25,27 @@ export function MainForm() {
         message: 'Informe o nome da tarefa antes de iniciar o ciclo.',
         type: 'warning',
       });
-
       return;
     }
 
     startTask(normalizedTaskName);
+    setTaskName('');
+  }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (activeTask) return; // trava caso o submit dispare enquanto já há task ativa
+
+    handleStart();
   }
 
   function handleInterruptTask() {
-    if (!activeTask) return;
-
-    const activeTaskName = activeTask.name;
-
     interruptTask();
 
     showNotification({
       title: 'Ciclo interrompido',
-      message: `${activeTaskName} foi cancelado.`,
+      message: `${activeTask?.name} foi cancelado.`,
       type: 'warning',
     });
   }
@@ -76,8 +77,9 @@ export function MainForm() {
       <div className="formRow">
         {!activeTask ? (
           <Button
-            type="submit"
+            type="button"
             icon={<PlayCircleIcon />}
+            onClick={handleStart}
           />
         ) : (
           <Button
@@ -85,6 +87,7 @@ export function MainForm() {
             color="red"
             icon={<StopCircleIcon />}
             onClick={handleInterruptTask}
+            aria-label="Interromper ciclo"
           />
         )}
       </div>
