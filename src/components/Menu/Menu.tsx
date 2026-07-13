@@ -5,8 +5,10 @@ import {
   SettingsIcon,
   SunIcon,
 } from 'lucide-react';
+import { NavLink } from 'react-router';
 import styles from './styles.module.css';
 import { useState, useEffect } from 'react';
+import { paths } from '../../routes/paths';
 
 type AvailableThemes = 'dark' | 'light';
 
@@ -38,36 +40,41 @@ export function Menu() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  function getMenuLinkClassName({ isActive }: { isActive: boolean }) {
+    return isActive ? `${styles.menuLink} ${styles.active}` : styles.menuLink;
+  }
+
   return (
     <nav className={styles.menu}>
-      <a
-        href='#'
-        className={styles.menuLink}
+      <NavLink
+        to={paths.home}
+        end
+        className={getMenuLinkClassName}
         aria-label='Ir para a Home'
         title='Ir para a Home'
       >
         <HouseIcon />
-      </a>
+      </NavLink>
 
-      <a
-        href='#'
-        className={styles.menuLink}
+      <NavLink
+        to={paths.history}
+        className={getMenuLinkClassName}
         aria-label='Ver Historico'
         title='Ver historico'
       >
         <HistoryIcon />
-      </a>
+      </NavLink>
 
-      <a
-        href='#'
-        className={styles.menuLink}
+      <NavLink
+        to={paths.settings}
+        className={getMenuLinkClassName}
         aria-label='Ir para as configurações'
         title='Ir para as configurações'
       >
         <SettingsIcon />
-      </a>
+      </NavLink>
 
-      <a
+       <a
         href='#'
         className={styles.menuLink}
         aria-label='Mudar tema'

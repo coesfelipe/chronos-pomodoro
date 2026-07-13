@@ -1,13 +1,11 @@
+import { Outlet } from 'react-router';
+
 import { Container } from '../../components/Container';
 import { Logo } from '../../components/Logo';
 import { Menu } from '../../components/Menu';
 import { Footer } from '../../components/Footer';
 
-type MainTemplateProps = {
-  children: React.ReactNode;
-};
-
-export function MainTemplate({ children }: MainTemplateProps) {
+export function MainTemplate() {
   return (
     <>
       <Container>
@@ -18,7 +16,7 @@ export function MainTemplate({ children }: MainTemplateProps) {
         <Menu />
       </Container>
 
-      {children}
+      <Outlet />
 
       <Container>
         <Footer />

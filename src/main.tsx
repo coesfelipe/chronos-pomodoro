@@ -1,15 +1,19 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router/dom';
 
-import { App } from './App';
+import { NotificationContainer } from './components/NotificationContainer';
 import { TaskContextProvider } from './contexts/TaskContext';
+import { router } from './routes/router';
 
-createRoot(
-  document.getElementById('root')!,
-).render(
+import './styles/theme.css';
+import './styles/global.css';
+
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <TaskContextProvider>
-      <App />
+      <NotificationContainer />
+      <RouterProvider router={router} />
     </TaskContextProvider>
   </StrictMode>,
 );
