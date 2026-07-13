@@ -102,10 +102,6 @@ export function Settings() {
             <label htmlFor="workTime">
               Tempo de foco
             </label>
-
-            <span>
-              {workTime} min
-            </span>
           </div>
 
           <input
@@ -135,9 +131,6 @@ export function Settings() {
               Descanso curto
             </label>
 
-            <span>
-              {shortBreakTime} min
-            </span>
           </div>
 
           <input
@@ -166,9 +159,7 @@ export function Settings() {
               Descanso longo
             </label>
 
-            <span>
-              {longBreakTime} min
-            </span>
+
           </div>
 
           <input

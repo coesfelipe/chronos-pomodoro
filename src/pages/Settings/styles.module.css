@@ -20,67 +20,34 @@
 
   gap: 2rem;
   margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .headerContent {
   display: flex;
   flex-direction: column;
-}
 
-.subtitle {
-  color: var(--primary);
-
-  font-size: 1.3rem;
-  font-weight: 700;
-
-  letter-spacing: 0.15rem;
-  text-transform: uppercase;
 }
 
 .header h1 {
   margin: 0.5rem 0 1rem;
 
   font-size: clamp(3rem, 6vw, 4.8rem);
+
 }
 
 .header p {
   max-width: 50rem;
 
-  color: var(--gray-400);
-
   font-size: 1.5rem;
   line-height: 1.6;
-}
-
-.backButton {
-  min-height: 4.4rem;
-  padding: 0 2rem;
-
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 1.2rem;
 
-  background: var(--primary);
-  color: white;
-
-  font-size: 1.4rem;
-  font-weight: 700;
-
-  text-decoration: none;
-
-  box-shadow: 0 0.8rem 2rem
-    rgba(0, 0, 0, 0.12);
-
-  transition:
-    transform 0.2s ease,
-    filter 0.2s ease;
-}
-
-.backButton:hover {
-  transform: translateY(-0.2rem);
-  filter: brightness(1.08);
 }
 
 .settingsCard {
@@ -121,17 +88,7 @@
   font-weight: 700;
 }
 
-.labelContent span {
-  padding: 0.5rem 1rem;
 
-  border-radius: 999rem;
-
-  background: rgba(99, 102, 241, 0.12);
-  color: var(--primary);
-
-  font-size: 1.3rem;
-  font-weight: 700;
-}
 
 .formGroup input {
   width: 100%;
