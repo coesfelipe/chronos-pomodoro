@@ -60,6 +60,7 @@ const defaultTaskConfig: TaskConfigModel = {
   longBreakTime: 15,
 };
 
+
 function formatSeconds(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds) % 60;
@@ -114,8 +115,25 @@ export function TaskContextProvider({
     setSecondsRemaining,
   ] = useState(0);
 
-  const [currentCycle, setCurrentCycle] =
-    useState(0);
+  const [currentCycle, setCurrentCycle] = useState(() => {
+  const savedCycle = localStorage.getItem(
+    'chronos-pomodoro:currentCycle',
+  );
+
+  if (!savedCycle) {
+    return 0;
+  }
+
+  try {
+    const parsedCycle = JSON.parse(savedCycle);
+
+    return typeof parsedCycle === 'number'
+      ? parsedCycle
+      : 0;
+  } catch {
+    return 0;
+  }
+  });
 
   const [notification, setNotification] =
     useState<AppNotification | null>(null);
@@ -313,6 +331,13 @@ export function TaskContextProvider({
       JSON.stringify(taskConfig),
     );
   }, [taskConfig]);
+
+  useEffect(() => {
+  localStorage.setItem(
+    'chronos-pomodoro:currentCycle',
+    JSON.stringify(currentCycle),
+  );
+  }, [currentCycle]);
 
   useEffect(() => {
     if (!activeTask) {
