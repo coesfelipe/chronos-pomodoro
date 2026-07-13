@@ -17,6 +17,7 @@
   height: 2rem;
   background-color: var(--primary);
   border-radius: 2rem;
+  flex-direction: column;
 }
 
 .workTime {
