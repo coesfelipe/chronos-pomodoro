@@ -65,9 +65,9 @@ export function MainForm() {
       </div>
 
       <div className="formRow">
-        <p>
-          Seu último ciclo foi {activeTask ? activeTask.name : 'nenhum ainda'}.
-        </p>
+        
+        {activeTask ? "Seu ultimo ciclo foi " + activeTask.name : "Nenhum ciclo foi iniciado."}
+          
       </div>
 
       <div className="formRow">
