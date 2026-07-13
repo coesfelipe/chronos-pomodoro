@@ -1,16 +1,13 @@
 import { useEffect } from 'react';
-
 import styles from './styles.module.css';
 
-type NotificationType =
-  | 'success'
-  | 'warning'
-  | 'info';
+type NotificationType = 'success' | 'warning' | 'info';
 
 type NotificationProps = {
   title: string;
   message: string;
   type?: NotificationType;
+  duration?: number;
   onClose: () => void;
 };
 
@@ -18,22 +15,22 @@ export function Notification({
   title,
   message,
   type = 'info',
+  duration = 5000,
   onClose,
 }: NotificationProps) {
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       onClose();
-    }, 5000);
+    }, duration);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duration]);
 
   return (
-    <div
-      className={`${styles.notification} ${styles[type]}`}
-    >
+    <div className={`${styles.notification} ${styles[type]}`}>
       <div className={styles.content}>
         <strong>{title}</strong>
         <p>{message}</p>
