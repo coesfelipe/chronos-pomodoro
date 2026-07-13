@@ -74,7 +74,7 @@ export function MainForm() {
       <div className="formRow">
         <Input
           id="meuInput"
-          labelText="Tarefa"
+          labelText="Tarefa:"
           type="text"
           placeholder="Digite algo"
           value={taskName}

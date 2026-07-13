@@ -4,7 +4,7 @@ import type { TaskModel } from '../../models/TaskModel';
 import styles from './styles.module.css';
 
 export function History() {
-  const { tasks } = useTaskContext();
+  const { tasks, clearHistory } = useTaskContext();
 
   const orderedTasks = [...tasks].reverse();
 
@@ -29,6 +29,18 @@ export function History() {
     }`;
   }
 
+  function handleClearHistory() {
+    const confirmed = window.confirm(
+      'Tem certeza que deseja apagar todo o histórico?',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    clearHistory();
+  }
+
   function getTaskStatus(task: TaskModel) {
     if (task.completeDate !== null) {
       return {
@@ -51,7 +63,7 @@ export function History() {
   }
 
   function getCycleName(type: TaskModel['type']) {
-    const cycleNames = {
+    const cycleNames: Record<TaskModel['type'], string> = {
       workTime: 'Foco',
       shortBreakTime: 'Descanso curto',
       longBreakTime: 'Descanso longo',
@@ -64,7 +76,6 @@ export function History() {
     <main className={styles.container}>
       <header className={styles.header}>
         <div>
-
           <h1>Histórico</h1>
 
           <p>
@@ -73,6 +84,15 @@ export function History() {
           </p>
         </div>
 
+        {tasks.length > 0 && (
+          <button
+            type="button"
+            className={styles.clearButton}
+            onClick={handleClearHistory}
+          >
+            Limpar histórico
+          </button>
+        )}
       </header>
 
       {orderedTasks.length === 0 ? (
@@ -80,10 +100,8 @@ export function History() {
           <h2>Nenhum ciclo encontrado</h2>
 
           <p>
-            Quando você iniciar um ciclo, ele aparecerá
-            aqui.
+            Quando você iniciar um ciclo, ele aparecerá aqui.
           </p>
-
         </section>
       ) : (
         <section className={styles.taskList}>
@@ -108,14 +126,14 @@ export function History() {
                     Iniciado em {formatDate(task.startDate)}
                   </p>
 
-                  {task.completeDate && (
+                  {task.completeDate !== null && (
                     <p>
                       Concluído em{' '}
                       {formatDate(task.completeDate)}
                     </p>
                   )}
 
-                  {task.interruptDate && (
+                  {task.interruptDate !== null && (
                     <p>
                       Interrompido em{' '}
                       {formatDate(task.interruptDate)}

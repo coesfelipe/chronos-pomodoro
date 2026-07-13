@@ -35,7 +35,7 @@ type TaskContextValue = {
   showNotification: (
     notification: AppNotification,
   ) => void;
-
+  clearHistory: () => void;
   closeNotification: () => void;
 
   startTask: (taskName: string) => void;
@@ -143,6 +143,10 @@ export function TaskContextProvider({
     newNotification: AppNotification,
   ) {
     setNotification(newNotification);
+  }
+
+  function clearHistory() {
+  setTasks([]);
   }
 
   function closeNotification() {
@@ -351,6 +355,7 @@ export function TaskContextProvider({
         formattedSecondsRemaining,
         currentCycle,
         taskConfig,
+        clearHistory,
         notification,
         showNotification,
         closeNotification,
