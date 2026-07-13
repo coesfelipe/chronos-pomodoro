@@ -10,11 +10,25 @@ export function MainForm() {
   const [taskName, setTaskName] = useState('');
 
   const {
+    tasks,
     activeTask,
     startTask,
     interruptTask,
     showNotification,
   } = useTaskContext();
+
+  const lastTask = tasks.at(-1);
+
+  const taskUsedToCalculateNextCycle = activeTask ?? lastTask;
+
+  const nextCycle =
+    taskUsedToCalculateNextCycle?.type === 'workTime'
+      ? 'Descanso curto'
+      : taskUsedToCalculateNextCycle?.type === 'shortBreakTime'
+        ? 'Trabalho'
+        : taskUsedToCalculateNextCycle?.type === 'longBreakTime'
+          ? 'Trabalho'
+          : null;
 
   function handleStart() {
     const normalizedTaskName = taskName.trim();
@@ -25,6 +39,7 @@ export function MainForm() {
         message: 'Informe o nome da tarefa antes de iniciar o ciclo.',
         type: 'warning',
       });
+
       return;
     }
 
@@ -35,17 +50,21 @@ export function MainForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (activeTask) return; // trava caso o submit dispare enquanto já há task ativa
+    if (activeTask) return;
 
     handleStart();
   }
 
   function handleInterruptTask() {
+    const interruptedTaskName = activeTask?.name;
+
     interruptTask();
 
     showNotification({
       title: 'Ciclo interrompido',
-      message: `${activeTask?.name} foi cancelado.`,
+      message: interruptedTaskName
+        ? `${interruptedTaskName} foi cancelado.`
+        : 'O ciclo foi cancelado.',
       type: 'warning',
     });
   }
@@ -65,9 +84,9 @@ export function MainForm() {
       </div>
 
       <div className="formRow">
-        
-        {activeTask ? "Seu ultimo ciclo foi " + activeTask.name : "Nenhum ciclo foi iniciado."}
-          
+        {nextCycle
+          ? `Próximo ciclo: ${nextCycle}`
+          : 'Nenhum ciclo foi iniciado.'}
       </div>
 
       <div className="formRow">
@@ -80,6 +99,7 @@ export function MainForm() {
             type="button"
             icon={<PlayCircleIcon />}
             onClick={handleStart}
+            aria-label="Iniciar ciclo"
           />
         ) : (
           <Button
