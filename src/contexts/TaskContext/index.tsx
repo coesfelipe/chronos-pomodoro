@@ -9,6 +9,7 @@ import {
 } from 'react';
 
 import type { TaskModel } from '../../models/TaskModel';
+import type { TaskConfigModel } from '../../models/TaskConfigModel';
 
 type CycleType =
   | 'workTime'
@@ -27,16 +28,23 @@ type TaskContextValue = {
   secondsRemaining: number;
   formattedSecondsRemaining: string;
   currentCycle: number;
+  taskConfig: TaskConfigModel;
 
   notification: AppNotification | null;
 
   showNotification: (
-    notification: AppNotification
+    notification: AppNotification,
   ) => void;
 
   closeNotification: () => void;
+
   startTask: (taskName: string) => void;
+
   interruptTask: () => void;
+
+  updateTaskConfig: (
+    newConfig: TaskConfigModel,
+  ) => void;
 };
 
 type TaskContextProviderProps = {
@@ -46,22 +54,24 @@ type TaskContextProviderProps = {
 const TaskContext =
   createContext<TaskContextValue | null>(null);
 
-const taskConfig = {
-  workTime: 0.3,
-  shortBreakTime: 0.3,
-  longBreakTime: 0.3,
+const defaultTaskConfig: TaskConfigModel = {
+  workTime: 25,
+  shortBreakTime: 5,
+  longBreakTime: 15,
 };
 
 function formatSeconds(seconds: number) {
   const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
+  const remainingSeconds = Math.floor(seconds) % 60;
 
   return `${String(minutes).padStart(2, '0')}:${String(
     remainingSeconds,
   ).padStart(2, '0')}`;
 }
 
-export function getCycleType(cycle: number): CycleType {
+export function getCycleType(
+  cycle: number,
+): CycleType {
   if (cycle % 8 === 0) {
     return 'longBreakTime';
   }
@@ -76,18 +86,58 @@ export function getCycleType(cycle: number): CycleType {
 export function TaskContextProvider({
   children,
 }: TaskContextProviderProps) {
-  const [tasks, setTasks] = useState<TaskModel[]>([]);
+  const [tasks, setTasks] = useState<TaskModel[]>(
+    () => {
+      const savedTasks = localStorage.getItem(
+        'chronos-pomodoro:tasks',
+      );
+
+      if (!savedTasks) {
+        return [];
+      }
+
+      try {
+        return JSON.parse(
+          savedTasks,
+        ) as TaskModel[];
+      } catch {
+        return [];
+      }
+    },
+  );
 
   const [activeTask, setActiveTask] =
     useState<TaskModel | null>(null);
 
-  const [secondsRemaining, setSecondsRemaining] =
-    useState(0);
+  const [
+    secondsRemaining,
+    setSecondsRemaining,
+  ] = useState(0);
 
-  const [currentCycle, setCurrentCycle] = useState(0);
+  const [currentCycle, setCurrentCycle] =
+    useState(0);
 
   const [notification, setNotification] =
     useState<AppNotification | null>(null);
+
+  const [taskConfig, setTaskConfig] =
+    useState<TaskConfigModel>(() => {
+      const savedConfig = localStorage.getItem(
+        'chronos-pomodoro:config',
+      );
+
+      if (!savedConfig) {
+        return defaultTaskConfig;
+      }
+
+      try {
+        return JSON.parse(
+          savedConfig,
+        ) as TaskConfigModel;
+      } catch {
+        return defaultTaskConfig;
+      }
+    });
 
   function showNotification(
     newNotification: AppNotification,
@@ -97,6 +147,46 @@ export function TaskContextProvider({
 
   function closeNotification() {
     setNotification(null);
+  }
+
+  function updateTaskConfig(
+    newConfig: TaskConfigModel,
+  ) {
+    if (activeTask) {
+      showNotification({
+        title: 'Ciclo em andamento',
+        message:
+          'Finalize ou interrompa o ciclo antes de alterar os tempos.',
+        type: 'warning',
+      });
+
+      return;
+    }
+
+    const hasInvalidValue =
+      newConfig.workTime <= 0 ||
+      newConfig.shortBreakTime <= 0 ||
+      newConfig.longBreakTime <= 0;
+
+    if (hasInvalidValue) {
+      showNotification({
+        title: 'Configuração inválida',
+        message:
+          'Todos os tempos precisam ser maiores que zero.',
+        type: 'warning',
+      });
+
+      return;
+    }
+
+    setTaskConfig(newConfig);
+
+    showNotification({
+      title: 'Configurações salvas',
+      message:
+        'Os tempos dos ciclos foram atualizados.',
+      type: 'success',
+    });
   }
 
   function startTask(taskName: string) {
@@ -127,7 +217,10 @@ export function TaskContextProvider({
 
     setActiveTask(newTask);
     setCurrentCycle(nextCycle);
-    setSecondsRemaining(duration * 60);
+
+    setSecondsRemaining(
+      Math.round(duration * 60),
+    );
 
     const cycleMessages = {
       workTime: {
@@ -182,6 +275,20 @@ export function TaskContextProvider({
       type: 'warning',
     });
   }
+
+  useEffect(() => {
+    localStorage.setItem(
+      'chronos-pomodoro:tasks',
+      JSON.stringify(tasks),
+    );
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      'chronos-pomodoro:config',
+      JSON.stringify(taskConfig),
+    );
+  }, [taskConfig]);
 
   useEffect(() => {
     if (!activeTask) {
@@ -243,11 +350,13 @@ export function TaskContextProvider({
         secondsRemaining,
         formattedSecondsRemaining,
         currentCycle,
+        taskConfig,
         notification,
         showNotification,
         closeNotification,
         startTask,
         interruptTask,
+        updateTaskConfig,
       }}
     >
       {children}

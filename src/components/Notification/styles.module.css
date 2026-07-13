@@ -10,15 +10,16 @@
   align-items: flex-start;
   gap: 1.2rem;
 
-  padding: 1.6rem;
-
-  color: rgba(255, 255, 255, 0.92);
+  padding: 1.4rem;
 
   background: #1c1c1e;
+  color: rgba(255, 255, 255, 0.92);
+
   border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 0.4rem solid currentColor;
   border-radius: 1.2rem;
 
-  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.28);
 
   animation: notificationEnter 0.25s ease-out;
 }
@@ -32,96 +33,137 @@
   align-items: center;
   justify-content: center;
 
-  font-size: 1.6rem;
-  font-weight: 600;
-
   border-radius: 1rem;
+
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
 .content {
   min-width: 0;
   flex: 1;
-  padding-top: 0.2rem;
 }
 
 .content strong {
   display: block;
-  margin-bottom: 0.2rem;
 
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin-bottom: 0.3rem;
+
+  color: rgba(255, 255, 255, 0.96);
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+
   font-size: 1.4rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
 }
 
 .content p {
   margin: 0;
 
-  color: rgba(235, 235, 245, 0.6);
+  color: rgba(235, 235, 245, 0.65);
 
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+
   font-size: 1.3rem;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .closeButton {
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.6rem;
+  height: 2.6rem;
   flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border: none;
-  background: transparent;
+  padding: 0;
 
+  border: none;
+  border-radius: 0.7rem;
+
+  background: transparent;
   color: rgba(255, 255, 255, 0.4);
+
   font-size: 1.8rem;
-  font-weight: 300;
   line-height: 1;
 
   cursor: pointer;
-  transition: color 0.15s ease;
+
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
 }
 
 .closeButton:hover {
   color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .closeButton:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.4);
   outline-offset: 2px;
-  border-radius: 0.4rem;
 }
 
-/* Variações */
+/* Sucesso */
+
+.success {
+  color: #30d158;
+}
 
 .success .icon {
   color: #30d158;
-  background: rgba(48, 209, 88, 0.14);
+  background: rgba(48, 209, 88, 0.12);
 }
 
-.warning .icon {
-  color: #ffd60a;
-  background: rgba(255, 214, 10, 0.14);
+.success .content strong {
+  color: #8ff0a8;
+}
+
+/* Informação */
+
+.info {
+  color: #0a84ff;
 }
 
 .info .icon {
   color: #0a84ff;
-  background: rgba(10, 132, 255, 0.14);
+  background: rgba(10, 132, 255, 0.12);
 }
 
-.error .icon {
-  color: #ff453a;
-  background: rgba(255, 69, 58, 0.14);
+.info .content strong {
+  color: #70b7ff;
+}
+
+/* Aviso */
+
+.warning {
+  color: #ffd60a;
+}
+
+.warning .icon {
+  color: #ffd60a;
+  background: rgba(255, 214, 10, 0.12);
+}
+
+.warning .content strong {
+  color: #ffe66d;
 }
 
 @keyframes notificationEnter {
   from {
     opacity: 0;
-    transform: translateY(-0.8rem);
+    transform: translateY(-1rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -133,7 +175,25 @@
     top: 1.2rem;
     right: 1.2rem;
     left: 1.2rem;
+
     width: auto;
+
+    padding: 1.3rem;
+  }
+
+  .icon {
+    width: 3.4rem;
+    height: 3.4rem;
+
+    font-size: 1.5rem;
+  }
+
+  .content strong {
+    font-size: 1.35rem;
+  }
+
+  .content p {
+    font-size: 1.25rem;
   }
 }
 
@@ -141,6 +201,7 @@
   .notification {
     animation: none;
   }
+
   .closeButton {
     transition: none;
   }

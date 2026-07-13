@@ -23,6 +23,13 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: paths.settings,
+        lazy: async () => {
+          const { Settings } = await import('../pages/Settings');
+          return { Component: Settings };
+        },
+      },
+      {
         path: 'about',
         lazy: async () => {
           const { AboutPomodoro } = await import('../pages/AboutPomodoro');

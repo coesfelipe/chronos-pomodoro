@@ -9,6 +9,7 @@ import { NavLink } from 'react-router';
 import styles from './styles.module.css';
 import { useState, useEffect } from 'react';
 import { paths } from '../../routes/paths';
+import { useTaskContext } from '../../contexts/TaskContext';
 
 type AvailableThemes = 'dark' | 'light';
 
@@ -18,6 +19,8 @@ export function Menu() {
       (localStorage.getItem('theme') as AvailableThemes) || 'dark';
     return storageTheme;
   });
+
+  const { showNotification } = useTaskContext();
 
   const nextThemeIcon = {
     dark: <SunIcon />,
@@ -31,8 +34,20 @@ export function Menu() {
 
     setTheme(prevTheme => {
       const nextTheme = prevTheme === 'dark' ? 'light' : 'dark';
+      
+      showNotification({
+      title: 'Tema alterado',
+      message:
+        nextTheme === 'dark'
+          ? 'Modo escuro ativado.'
+          : 'Modo claro ativado.',
+      type: 'info',
+       });
+      
       return nextTheme;
+
     });
+    
   }
 
   useEffect(() => {
