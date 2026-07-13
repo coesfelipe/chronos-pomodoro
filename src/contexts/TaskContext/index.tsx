@@ -146,8 +146,28 @@ export function TaskContextProvider({
   }
 
   function clearHistory() {
-  setTasks([]);
+  if (activeTask) {
+    showNotification({
+      title: 'Ciclo em andamento',
+      message:
+        'Interrompa ou conclua o ciclo antes de limpar o histórico.',
+      type: 'warning',
+    });
+
+    return;
   }
+
+  setTasks([]);
+  setCurrentCycle(0);
+  setSecondsRemaining(0);
+
+  showNotification({
+    title: 'Histórico limpo',
+    message:
+      'A sequência de ciclos começará novamente pelo foco.',
+    type: 'success',
+  });
+}
 
   function closeNotification() {
     setNotification(null);
