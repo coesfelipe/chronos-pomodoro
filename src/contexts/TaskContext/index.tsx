@@ -15,12 +15,26 @@ type CycleType =
   | 'shortBreakTime'
   | 'longBreakTime';
 
+type AppNotification = {
+  title: string;
+  message: string;
+  type: 'success' | 'warning' | 'info';
+};
+
 type TaskContextValue = {
   tasks: TaskModel[];
   activeTask: TaskModel | null;
   secondsRemaining: number;
   formattedSecondsRemaining: string;
   currentCycle: number;
+
+  notification: AppNotification | null;
+
+  showNotification: (
+    notification: AppNotification
+  ) => void;
+
+  closeNotification: () => void;
   startTask: (taskName: string) => void;
   interruptTask: () => void;
 };
@@ -33,9 +47,9 @@ const TaskContext =
   createContext<TaskContextValue | null>(null);
 
 const taskConfig = {
-  workTime: 1,
-  shortBreakTime: 1,
-  longBreakTime: 1,
+  workTime: 0.3,
+  shortBreakTime: 0.3,
+  longBreakTime: 0.3,
 };
 
 function formatSeconds(seconds: number) {
@@ -47,7 +61,7 @@ function formatSeconds(seconds: number) {
   ).padStart(2, '0')}`;
 }
 
-function getCycleType(cycle: number): CycleType {
+export function getCycleType(cycle: number): CycleType {
   if (cycle % 8 === 0) {
     return 'longBreakTime';
   }
@@ -63,11 +77,27 @@ export function TaskContextProvider({
   children,
 }: TaskContextProviderProps) {
   const [tasks, setTasks] = useState<TaskModel[]>([]);
+
   const [activeTask, setActiveTask] =
     useState<TaskModel | null>(null);
+
   const [secondsRemaining, setSecondsRemaining] =
     useState(0);
+
   const [currentCycle, setCurrentCycle] = useState(0);
+
+  const [notification, setNotification] =
+    useState<AppNotification | null>(null);
+
+  function showNotification(
+    newNotification: AppNotification,
+  ) {
+    setNotification(newNotification);
+  }
+
+  function closeNotification() {
+    setNotification(null);
+  }
 
   function startTask(taskName: string) {
     const name = taskName.trim();
@@ -98,6 +128,30 @@ export function TaskContextProvider({
     setActiveTask(newTask);
     setCurrentCycle(nextCycle);
     setSecondsRemaining(duration * 60);
+
+    const cycleMessages = {
+      workTime: {
+        title: 'Hora de focar',
+        message: `${name} foi iniciado.`,
+      },
+
+      shortBreakTime: {
+        title: 'Descanso curto',
+        message:
+          'Relaxe um pouco antes do próximo foco.',
+      },
+
+      longBreakTime: {
+        title: 'Descanso longo',
+        message:
+          'Você completou uma sequência de ciclos.',
+      },
+    };
+
+    showNotification({
+      ...cycleMessages[cycleType],
+      type: 'info',
+    });
   }
 
   function interruptTask() {
@@ -106,6 +160,7 @@ export function TaskContextProvider({
     }
 
     const activeTaskId = activeTask.id;
+    const activeTaskName = activeTask.name;
 
     setTasks(previousTasks =>
       previousTasks.map(task =>
@@ -120,6 +175,12 @@ export function TaskContextProvider({
 
     setActiveTask(null);
     setSecondsRemaining(0);
+
+    showNotification({
+      title: 'Ciclo interrompido',
+      message: `${activeTaskName} foi cancelado.`,
+      type: 'warning',
+    });
   }
 
   useEffect(() => {
@@ -128,6 +189,7 @@ export function TaskContextProvider({
     }
 
     const activeTaskId = activeTask.id;
+    const activeTaskName = activeTask.name;
 
     const intervalId = window.setInterval(() => {
       setSecondsRemaining(previousSeconds => {
@@ -155,6 +217,12 @@ export function TaskContextProvider({
             : currentTask,
         );
 
+        showNotification({
+          title: 'Ciclo concluído',
+          message: `${activeTaskName} foi concluído.`,
+          type: 'success',
+        });
+
         return 0;
       });
     }, 1000);
@@ -175,6 +243,9 @@ export function TaskContextProvider({
         secondsRemaining,
         formattedSecondsRemaining,
         currentCycle,
+        notification,
+        showNotification,
+        closeNotification,
         startTask,
         interruptTask,
       }}
